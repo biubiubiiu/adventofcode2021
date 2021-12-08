@@ -5,47 +5,43 @@ fun main() {
         "up" to Pair(0, -1)
     )
 
-    fun Sequence<String>.map2pair(): Sequence<Pair<String, Int>> {
+    fun Sequence<String>.map2OpsUnit(): Sequence<Triple<Int, Int, Int>> {
         return this.map { it.split(" ").take(2) }
-            .map { (op, dis) -> Pair(op, dis.toInt()) }
+            .map { (op, unit) ->
+                val (op_x, op_y) = requireNotNull(OPERATOR_MAP[op])
+                Triple(op_x, op_y, unit.toInt())
+            }
     }
 
     fun part1(input: List<String>): Int {
         return input.asSequence()
-            .map2pair()
-            .map { (op, dis) ->
-                val (move_x, move_y) = requireNotNull(OPERATOR_MAP[op])
-                Pair(move_x * dis, move_y * dis)
-            }
+            .map2OpsUnit()
+            .map { (op_x, op_y, unit) -> Pair(op_x * unit, op_y * unit) }
             .reduce { (move_x_a, move_y_a), (move_x_b, move_y_b) ->
                 Pair(move_x_a + move_x_b, move_y_a + move_y_b)
             }
-            .toList()
-            .reduce { x, y -> x * y }
+            .let { it.first * it.second }
     }
 
+    data class State(val x: Int, val y: Int, val aim: Int = -1)
+
     fun part2(input: List<String>): Int {
-        var current_x = 0
-        var current_y = 0
-        var aim = 0
+        var state = State(x = 0, y = 0, aim = 0)
 
         input.asSequence()
-            .map2pair()
-            .map { (op, unit) ->
-                val (op_x, op_y) = requireNotNull(OPERATOR_MAP[op])
-                Triple(op_x, op_y, unit)
-            }
+            .map2OpsUnit()
             .forEach { (op_x, op_y, unit) ->
-                current_x += op_x * unit
-                current_y += if (op_x > 0) aim * unit else 0 // only dive when forward
-                aim += op_y * unit
+                val (x, y, aim) = state
+                val next_x = x + op_x * unit
+                val next_y = y + if (op_x > 0) aim * unit else 0 // only dive when forward
+                val next_aim = aim + op_y * unit
+                state = state.copy(x = next_x, y = next_y, aim = next_aim)
             }
 
-        return current_x * current_y
+        return state.x * state.y
     }
 
     val input = readInput("Day02")
     println(part1(input))
     println(part2(input))
 }
-
