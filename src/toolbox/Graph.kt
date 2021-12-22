@@ -6,16 +6,22 @@ package toolbox
 
 class Graph<T> {
     val adjacencyMap: HashMap<T, HashSet<T>> = HashMap()
+    val edgeWeights: HashMap<Pair<T, T>, Int> = HashMap()
 
-    fun addEdge(sourceVertex: T, destinationVertex: T) {
+    fun addEdge(sourceVertex: T, destinationVertex: T, weight: Int = 1, bidirectional: Boolean = true) {
         // Add edge to source vertex / node.
         adjacencyMap
             .computeIfAbsent(sourceVertex) { HashSet() }
             .add(destinationVertex)
-        // Add edge to destination vertex / node.
-        adjacencyMap
-            .computeIfAbsent(destinationVertex) { HashSet() }
-            .add(sourceVertex)
+        edgeWeights[sourceVertex to destinationVertex] = weight
+
+        if (bidirectional) {
+            // Add edge to destination vertex / node.
+            adjacencyMap
+                .computeIfAbsent(destinationVertex) { HashSet() }
+                .add(sourceVertex)
+            edgeWeights[destinationVertex to sourceVertex] = weight
+        }
     }
 
     override fun toString() = buildString {
