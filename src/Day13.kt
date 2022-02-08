@@ -1,6 +1,6 @@
-fun main() {
+import toolbox.Point
 
-    data class Point(val x: Int, val y: Int)
+fun main() {
 
     class Board {
         private val points = mutableSetOf<Point>()

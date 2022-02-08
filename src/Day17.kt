@@ -1,4 +1,4 @@
-import toolbox.Point2d
+import toolbox.Point
 import kotlin.math.min
 import kotlin.math.max
 import kotlin.math.abs
@@ -6,16 +6,16 @@ import kotlin.math.sign
 
 private class TargetArea(str: String) {
 
-    val topLeft: Point2d
-    val bottomRight: Point2d
+    val topLeft: Point
+    val bottomRight: Point
 
     init {
         val (xRangeStr, yRangeStr) = str.removePrefix("target area: ").split(", ")
         val (minXStr, maxXStr) = xRangeStr.removePrefix("x=").split("..")
         val (minYStr, maxYStr) = yRangeStr.removePrefix("y=").split("..")
 
-        topLeft = Point2d(x = minXStr.toInt(), y = maxYStr.toInt())
-        bottomRight = Point2d(x = maxXStr.toInt(), y = minYStr.toInt())
+        topLeft = Point(x = minXStr.toInt(), y = maxYStr.toInt())
+        bottomRight = Point(x = maxXStr.toInt(), y = minYStr.toInt())
     }
 }
 
@@ -25,7 +25,7 @@ private sealed class RelativePosition {
     object Overfly : RelativePosition()
 }
 
-private fun Point2d.relation(target: TargetArea) = when {
+private fun Point.relation(target: TargetArea) = when {
     this.x in (target.topLeft.x..target.bottomRight.x)
             && this.y in (target.bottomRight.y..target.topLeft.y) -> RelativePosition.Hit
     // Note: this is a simplified judgement, which doesn't holds
@@ -36,17 +36,17 @@ private fun Point2d.relation(target: TargetArea) = when {
 
 private class Probe(private var vx: Int, private var vy: Int) {
 
-    private val trajectory: MutableList<Point2d> = mutableListOf()
+    private val trajectory: MutableList<Point> = mutableListOf()
     val maxHeight get() = trajectory.maxOf { it.y }
 
-    fun step(): Point2d {
+    fun step(): Point {
         if (trajectory.size > 0) {
             vx -= vx.sign
             vy -= 1
         }
 
-        val current = trajectory.lastOrNull() ?: Point2d(0, 0)
-        val next = current.copy(x = current.x + vx, y = current.y + vy)
+        val current = trajectory.lastOrNull() ?: Point.Zero
+        val next = current.copy().add(vx, vy)
         trajectory.add(next)
         return next
     }

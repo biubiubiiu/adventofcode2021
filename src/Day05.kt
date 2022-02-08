@@ -1,20 +1,11 @@
+import toolbox.Point
 import kotlin.math.abs
 import kotlin.math.max
 
-data class Point(
-    val x: Int,
-    val y: Int
-) {
-    override fun toString(): String {
-        return "$x,$y"
-    }
 
-    companion object {
-        fun from(s: String): Point {
-            val (x, y) = s.split(",").take(2).map { it.toInt() }
-            return Point(x, y)
-        }
-    }
+private fun String.map2Point(): Point {
+    val (x, y) = this.split(",").take(2).map { it.toInt() }
+    return Point(x, y)
 }
 
 class Line(
@@ -42,7 +33,7 @@ class Line(
     companion object {
         fun from(s: String): Line {
             val (start, end) = s.split("->").take(2).map { it.trim() }
-            return Line(Point.from(start), Point.from(end))
+            return Line(start.map2Point(), end.map2Point())
         }
     }
 }

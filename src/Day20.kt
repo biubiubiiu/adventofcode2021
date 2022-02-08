@@ -1,8 +1,7 @@
+import toolbox.Point
 import toolbox.cartesianProduct
 
 fun main() {
-
-    data class Point(val x: Int, val y: Int)
 
     class Simulator(
         enhancementStr: String,
